@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mvndicraft Damage Calculator</title>
+    <title>Mvndicraft Advanced Combat & TTK Calculator</title>
     <style>
         :root {
-            --bg-color: #1e1e24;
-            --panel-bg: #2b2b36;
+            --bg-color: #1a1a20;
+            --panel-bg: #252530;
             --text-color: #e0e0e0;
-            --accent: #d89b3c;
-            --accent-hover: #b8822e;
-            --input-bg: #18181d;
-            --border: #3d3d4b;
+            --accent: #e2a849;
+            --input-bg: #15151a;
+            --border: #3a3a4a;
+            --mc-bg: #110011;
+            --mc-border: #3a1162;
+            --info-bg: #1c2331;
+            --info-border: #2c3e50;
+            --ttk-bg: #311818;
+            --ttk-border: #803030;
         }
 
         body {
@@ -21,211 +26,502 @@
             color: var(--text-color);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
         }
 
-        .calculator {
-            background-color: var(--panel-bg);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            max-width: 400px;
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1050px;
             width: 100%;
-            border: 1px solid var(--border);
+            flex-wrap: wrap;
         }
 
-        h2 {
+        .panel {
+            background-color: var(--panel-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            flex: 1;
+            min-width: 320px;
+        }
+
+        h2, h3 {
             margin-top: 0;
             color: var(--accent);
-            text-align: center;
-            font-size: 24px;
             border-bottom: 2px solid var(--border);
-            padding-bottom: 15px;
+            padding-bottom: 10px;
+        }
+
+        .section-title {
+            margin-top: 20px;
+            margin-bottom: 15px;
+            color: #aaa;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
         }
 
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .input-group label {
-            font-size: 14px;
-            flex-basis: 60%;
+            font-size: 13.5px;
+            flex-basis: 58%;
         }
 
-        .input-group input {
-            flex-basis: 35%;
+        .input-group input, .input-group select {
+            flex-basis: 38%;
             background-color: var(--input-bg);
             border: 1px solid var(--border);
             color: white;
-            padding: 8px;
+            padding: 6px 8px;
             border-radius: 6px;
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s;
         }
 
-        .input-group input:focus {
+        .input-group input:focus, .input-group select:focus {
             border-color: var(--accent);
         }
 
-        .results {
-            margin-top: 25px;
-            padding: 20px;
-            background-color: var(--input-bg);
-            border-radius: 8px;
-            border: 1px solid var(--border);
+        .hint-text {
+            font-size: 11px;
+            color: #888;
+            display: block;
+            margin-top: -8px;
+            margin-bottom: 10px;
+            text-align: right;
         }
 
-        .result-row {
+        /* Minecraft Tooltip Style */
+        .mc-tooltip {
+            background-color: var(--mc-bg);
+            border: 2px solid var(--mc-border);
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        
+        .mc-label { color: #aaaaaa; }
+        .mc-red { color: #ff5555; }
+        .mc-yellow { color: #ffff55; }
+        .mc-white { color: #ffffff; }
+
+        /* Breakdown Info Box */
+        .breakdown-box {
+            background-color: var(--info-bg);
+            border: 1px solid var(--info-border);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .breakdown-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 4px 0;
+        }
+        .breakdown-row:last-child { border-bottom: none; }
+        .highlight { color: var(--accent); font-weight: bold; }
+        .sub-text { font-size: 12px; color: #888; }
+
+        .testing-tool {
+            background-color: #2a203a;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #8a52e2;
+            margin-bottom: 15px;
         }
 
-        .result-row.final {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed var(--border);
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .note {
-            font-size: 12px;
-            color: #888;
-            text-align: center;
+        .ttk-box {
+            background-color: var(--ttk-bg);
+            border: 1px solid var(--ttk-border);
+            border-radius: 8px;
+            padding: 15px;
             margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
-<div class="calculator">
-    <h2>Combat Calculator</h2>
+<div class="container">
+    <!-- LEFT PANEL: INPUTS -->
+    <div class="panel">
+        <h2>Configuration & Inputs</h2>
 
-    <!-- Weapon Stats -->
-    <div class="input-group">
-        <label title="The base damage of the weapon">Weapon Base Damage:</label>
-        <input type="number" id="baseDmg" value="15.3" step="0.1" oninput="calculate()">
-    </div>
-    <div class="input-group">
-        <label title="The weapon's strength scaling percentage">Strength Multiplier (%):</label>
-        <input type="number" id="strMult" value="53.5" step="0.1" oninput="calculate()">
-    </div>
-    <div class="input-group">
-        <label title="The weapon's dexterity scaling percentage">Dexterity Multiplier (%):</label>
-        <input type="number" id="dexMult" value="53.5" step="0.1" oninput="calculate()">
-    </div>
-
-    <!-- Player Stats -->
-    <div style="margin-top: 25px; margin-bottom: 15px; border-top: 1px solid var(--border); padding-top: 15px; color: #aaa; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Player & Target</div>
-    <div class="input-group">
-        <label title="Your player's strength level">Strength Level (1-99):</label>
-        <input type="number" id="strLvl" value="40" min="1" max="99" oninput="calculate()">
-    </div>
-    <div class="input-group">
-        <label title="Your player's dexterity level">Dexterity Level (1-99):</label>
-        <input type="number" id="dexLvl" value="40" min="1" max="99" oninput="calculate()">
-    </div>
-    <div class="input-group">
-        <label title="The armor rating (Defense) of the target">Target Armor Rating:</label>
-        <input type="number" id="armor" value="26.02" step="0.1" oninput="calculate()">
-    </div>
-
-    <!-- Results Box -->
-    <div class="results">
-        <div class="result-row">
-            <span>Raw Attack:</span>
-            <span id="outRaw">29.22</span>
+        <div class="section-title" style="margin-top: 0;">1. Weapon Base Stats</div>
+        
+        <div class="input-group" style="background-color: #2c2c3a; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #4a4a5a;">
+            <label style="color: #e2a849; font-weight: bold;">Load Preset Weapon:</label>
+            <select id="weaponPreset" onchange="loadPreset()">
+                <option value="longsword">Longsword (+3)</option>
+                <option value="billhook">Billhook (+3)</option>
+                <option value="halberd">Halberd (+3)</option>
+                <option value="pike">Pike (+3)</option>
+                <option value="lance">Lance</option>
+                <option value="custom">-- Custom --</option>
+            </select>
         </div>
-        <div class="result-row final">
-            <span>Damage Dealt:</span>
-            <span id="outFinal">13.06</span>
+
+        <div class="input-group">
+            <label>Weapon Name (UI Only):</label>
+            <input type="text" id="wpnName" value="Longsword" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Base Damage:</label>
+            <input type="number" id="baseDmg" value="15.3" step="0.1" oninput="setCustomPreset(); calculate()">
+        </div>
+        <div class="input-group">
+            <label>Quality Bonus (+):</label>
+            <input type="number" id="qualBonus" value="5.9" step="0.1" oninput="setCustomPreset(); calculate()">
+        </div>
+        <div class="input-group">
+            <label>Quality Multiplier (x):</label>
+            <input type="number" id="qualMult" value="1.3" step="0.1" oninput="setCustomPreset(); calculate()">
+        </div>
+        <div class="input-group">
+            <label>Weapon Attack Speed (s):</label>
+            <input type="number" id="wpnSpeed" value="1.4" step="0.1" oninput="setCustomPreset(); calculate()">
+        </div>
+        
+        <div class="section-title">2. Attribute Scaling</div>
+        <div class="input-group">
+            <label>Strength Multiplier (%):</label>
+            <input type="number" id="strMult" value="53.5" step="0.1" oninput="setCustomPreset(); calculate()">
+        </div>
+        <div class="input-group">
+            <label>Dexterity Multiplier (%):</label>
+            <input type="number" id="dexMult" value="53.5" step="0.1" oninput="setCustomPreset(); calculate()">
+        </div>
+        <div class="input-group">
+            <label>Your Strength Level:</label>
+            <input type="number" id="strLvl" value="1" min="1" max="99" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Your Dexterity Level:</label>
+            <input type="number" id="dexLvl" value="1" min="1" max="99" oninput="calculate()">
+        </div>
+
+        <div class="section-title">3. Scaling Formula Mode (Testing)</div>
+        <div class="testing-tool" style="margin-bottom: 0;">
+            <select id="scalingMode" onchange="calculate()" style="width: 100%; padding: 8px;">
+                <option id="opt1" value="baseOnly">Raw Base Only</option>
+                <option id="opt2" value="baseAndFlat">Base + Quality Bonus</option>
+                <option id="opt3" value="baseFlatMult" selected>Full Tooltip Weapon Damage</option>
+            </select>
+        </div>
+
+        <div class="section-title">4. Target & Combat</div>
+        <div class="input-group" style="margin-bottom: 4px;">
+            <label>Target Armor Rating:</label>
+            <input type="number" id="armor" value="0.0" step="0.1" oninput="calculate()">
+        </div>
+        <span class="hint-text">Hint: Light Set = 26.02 | Heavy Set = 38.07</span>
+
+        <div class="input-group">
+            <label>Target Type:</label>
+            <select id="targetType" onchange="toggleTargetType(); calculate()">
+                <option value="player">Player (Uses Vitality)</option>
+                <option value="custom">Mob / Custom HP</option>
+            </select>
+        </div>
+        <div class="input-group" id="vitGroup">
+            <label>Target Vitality Lvl (1-99):</label>
+            <input type="number" id="enemyVit" value="1" min="1" max="99" oninput="calculate()">
+        </div>
+        <div class="input-group" id="hpGroup" style="display: none;">
+            <label>Target Custom HP:</label>
+            <input type="number" id="customHp" value="100" step="1" oninput="calculate()">
         </div>
     </div>
 
-    <div class="note">Automatically calculates as you type.</div>
+    <!-- RIGHT PANEL: BREAKDOWN & RESULTS -->
+    <div class="panel">
+        <h2>Combat Analytics</h2>
+
+        <!-- Tooltip Preview -->
+        <div class="mc-tooltip">
+            <span class="mc-white" id="ttName">Longsword</span><br>
+            <span class="mc-label" id="ttUpgradeLabel">Upgrade Level: </span><span class="mc-white" id="ttUpgrade">+3</span><br>
+            <span class="mc-label">Damage: </span><span id="ttDmgLine"></span><br>
+            <span class="mc-label">Strength Bonus: </span><span class="mc-red" id="ttStrPct">53.5%</span><br>
+            <span class="mc-label">Dexterity Bonus: </span><span class="mc-red" id="ttDexPct">53.5%</span><br>
+            <span class="mc-label">Speed: </span><span class="mc-red" id="ttSpeed">1.4s</span><br>
+        </div>
+
+        <!-- Detailed Step-by-Step Math -->
+        <div class="breakdown-box">
+            <h3 style="font-size: 15px; margin-bottom: 10px; padding-bottom: 5px;">Phase 1: Weapon Intrinsic Damage</h3>
+            <div class="breakdown-row sub-text">
+                <span colspan="2">Formula: (Base + Qual Bonus) × Qual Multiplier</span>
+            </div>
+            <div class="breakdown-row">
+                <span>Weapon Tooltip Damage:</span>
+                <strong id="bdWpnDamage" style="color: #ffaaaa;">0.00</strong>
+            </div>
+
+            <h3 style="font-size: 15px; margin-top: 15px; margin-bottom: 10px; padding-bottom: 5px;">Phase 2: Player Attribute Bonus</h3>
+            <div class="breakdown-row sub-text">
+                <span colspan="2">Formula: Scaling Base × Weapon% × Player Level%</span>
+            </div>
+            <div class="breakdown-row">
+                <span>Scaling Base Used:</span>
+                <span id="bdScalingBase" style="color:#d0c0f0;">0.00</span>
+            </div>
+            <div class="breakdown-row">
+                <span>Total Attribute Bonus:</span>
+                <strong id="bdTotalAttrBonus" style="color:#ffff55">+0.00</strong>
+            </div>
+            <div class="breakdown-row" style="margin-top: 10px; font-size: 16px; border-top: 1px dashed var(--info-border); padding-top: 10px;">
+                <strong>Total Raw Attack Output:</strong>
+                <strong id="bdExactRaw" class="highlight">0.00</strong>
+            </div>
+
+            <h3 style="font-size: 15px; margin-top: 15px; margin-bottom: 10px; padding-bottom: 5px;">Phase 3: Armor Mitigation</h3>
+            <div class="breakdown-row">
+                <span>Ratio (Atk / Def):</span>
+                <span id="bdRatio">1.109</span>
+            </div>
+            <div class="breakdown-row">
+                <span>Armor Bracket Triggered:</span>
+                <span id="bdBracket" style="color:#aaa;">Calculating...</span>
+            </div>
+            <div class="breakdown-row" style="margin-top: 10px; font-size: 18px; border-top: 1px dashed var(--info-border); padding-top: 10px;">
+                <strong>Actual Damage Dealt:</strong>
+                <strong id="bdFinalDamage" style="color: #ff5555;">0.00</strong>
+            </div>
+        </div>
+
+        <!-- Time to Kill (TTK) Box -->
+        <div class="ttk-box">
+            <h3 style="font-size: 16px; margin-bottom: 10px; padding-bottom: 5px; color: #ff6666; border-bottom: 1px solid var(--ttk-border);">Phase 4: Lethality (TTK)</h3>
+            <div class="breakdown-row">
+                <span>Target Maximum HP:</span>
+                <span id="ttkHp">40.00</span>
+            </div>
+            <div class="breakdown-row">
+                <span>Attack Speed:</span>
+                <span id="ttkSpeed">1.4s per swing</span>
+            </div>
+            <div class="breakdown-row">
+                <span>Hits to Kill:</span>
+                <strong id="ttkHits" style="color: #ffaa55;">0 Hits</strong>
+            </div>
+            <div class="breakdown-row" style="margin-top: 10px; font-size: 18px; border-top: 1px dashed var(--ttk-border); padding-top: 10px;">
+                <strong>Time to Kill (TTK):</strong>
+                <strong id="ttkTime" style="color: #ff5555;">0.00s</strong>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    // Recreates the stat multiplier tables from Mvndicraft dynamically
+    const presets = {
+        "longsword": { name: "Longsword", base: 15.3, qb: 5.9, qm: 1.3, str: 53.5, dex: 53.5, spd: 1.4, upg: "+3" },
+        "billhook": { name: "Billhook", base: 16.8, qb: 5.9, qm: 1.3, str: 15.8, dex: 75.6, spd: 1.8, upg: "+3" },
+        "halberd": { name: "Halberd", base: 16.8, qb: 2.7, qm: 1.3, str: 39.9, dex: 52.5, spd: 1.8, upg: "+3" },
+        "pike": { name: "Pike", base: 19.3, qb: 0.0, qm: 1.3, str: 23.1, dex: 73.5, spd: 1.8, upg: "+3" },
+        "lance": { name: "Lance", base: 4.3, qb: 0.0, qm: 1.0, str: 15.0, dex: 72.0, spd: 1.5, upg: "None" }
+    };
+
+    function loadPreset() {
+        let key = document.getElementById('weaponPreset').value;
+        if (presets[key]) {
+            let p = presets[key];
+            document.getElementById('wpnName').value = p.name;
+            document.getElementById('baseDmg').value = p.base;
+            document.getElementById('qualBonus').value = p.qb;
+            document.getElementById('qualMult').value = p.qm;
+            document.getElementById('strMult').value = p.str;
+            document.getElementById('dexMult').value = p.dex;
+            document.getElementById('wpnSpeed').value = p.spd;
+            document.getElementById('ttUpgrade').innerText = p.upg;
+            if (p.upg === "None") {
+                document.getElementById('ttUpgrade').style.display = 'none';
+                document.getElementById('ttUpgradeLabel').style.display = 'none';
+            } else {
+                document.getElementById('ttUpgrade').style.display = 'inline';
+                document.getElementById('ttUpgradeLabel').style.display = 'inline';
+            }
+        }
+        calculate();
+    }
+
+    function setCustomPreset() {
+        document.getElementById('weaponPreset').value = "custom";
+        document.getElementById('ttUpgrade').innerText = "Custom";
+        document.getElementById('ttUpgrade').style.display = 'inline';
+        document.getElementById('ttUpgradeLabel').style.display = 'inline';
+    }
+
+    function toggleTargetType() {
+        let type = document.getElementById('targetType').value;
+        if (type === 'player') {
+            document.getElementById('vitGroup').style.display = 'flex';
+            document.getElementById('hpGroup').style.display = 'none';
+        } else {
+            document.getElementById('vitGroup').style.display = 'none';
+            document.getElementById('hpGroup').style.display = 'flex';
+        }
+    }
+
     function getLevelMultiplier(level) {
         if (level < 1) level = 1;
         if (level > 99) level = 99;
-        
         let mult = 0;
-        
-        // Levels 1-10 (+0.005 per level)
-        if (level >= 1) {
-            let steps = Math.min(level, 10) - 1;
-            mult += 0.005 + (steps * 0.005);
-        }
-        // Levels 11-20 (+0.035 per level)
-        if (level > 10) {
-            let steps = Math.min(level, 20) - 10;
-            mult += (steps * 0.035);
-        }
-        // Levels 21-40 (+0.0225 per level)
-        if (level > 20) {
-            let steps = Math.min(level, 40) - 20;
-            mult += (steps * 0.0225);
-        }
-        // Levels 41-99 (+0.0025 per level)
-        if (level > 40) {
-            let steps = Math.min(level, 99) - 40;
-            mult += (steps * 0.0025);
-        }
-        
+        if (level >= 1) mult += 0.005 + ((Math.min(level, 10) - 1) * 0.005);
+        if (level > 10) mult += ((Math.min(level, 20) - 10) * 0.035);
+        if (level > 20) mult += ((Math.min(level, 40) - 20) * 0.0225);
+        if (level > 40) mult += ((Math.min(level, 99) - 40) * 0.0025);
         return mult;
     }
 
     function calculate() {
         // Fetch inputs
+        let wpnName = document.getElementById('wpnName').value || "Weapon";
         let baseDmg = parseFloat(document.getElementById('baseDmg').value) || 0;
-        let strMult = (parseFloat(document.getElementById('strMult').value) || 0) / 100;
-        let dexMult = (parseFloat(document.getElementById('dexMult').value) || 0) / 100;
+        let qualBonus = parseFloat(document.getElementById('qualBonus').value) || 0;
+        let qualMult = parseFloat(document.getElementById('qualMult').value) || 1;
+        
+        let strMultRaw = parseFloat(document.getElementById('strMult').value) || 0;
+        let dexMultRaw = parseFloat(document.getElementById('dexMult').value) || 0;
+        let strMult = strMultRaw / 100;
+        let dexMult = dexMultRaw / 100;
+        let wpnSpeed = parseFloat(document.getElementById('wpnSpeed').value) || 1.0;
+
         let strLvl = parseInt(document.getElementById('strLvl').value) || 1;
         let dexLvl = parseInt(document.getElementById('dexLvl').value) || 1;
         let def = parseFloat(document.getElementById('armor').value) || 0;
 
-        // 1. Calculate the Raw Attack Damage
-        let strBonus = baseDmg * strMult * getLevelMultiplier(strLvl);
-        let dexBonus = baseDmg * dexMult * getLevelMultiplier(dexLvl);
-        let atk = baseDmg + strBonus + dexBonus;
+        // Phase 1: Intrinsic Weapon Damage
+        let weaponBaseCombined = baseDmg + qualBonus;
+        let weaponTooltipDmg = weaponBaseCombined * qualMult;
 
-        // 2. Calculate Damage Through Armor (Dark Souls 3 Formula)
-        let finalDmg = atk;
+        // Update Testing Dropdown Text dynamically
+        document.getElementById('opt1').innerText = `Base Only (${baseDmg.toFixed(1)})`;
+        document.getElementById('opt2').innerText = `Base + Qual Bonus (${weaponBaseCombined.toFixed(1)})`;
+        document.getElementById('opt3').innerText = `Full Tooltip Damage (${weaponTooltipDmg.toFixed(2)})`;
+
+        // Phase 2: Attribute Bonus Calculation
+        let scalingMode = document.getElementById('scalingMode').value;
+        let scalingBase = baseDmg;
+        if (scalingMode === 'baseAndFlat') scalingBase = weaponBaseCombined;
+        if (scalingMode === 'baseFlatMult') scalingBase = weaponTooltipDmg;
+
+        let strLvlPct = getLevelMultiplier(strLvl);
+        let dexLvlPct = getLevelMultiplier(dexLvl);
+
+        let strBonus = scalingBase * strMult * strLvlPct;
+        let dexBonus = scalingBase * dexMult * dexLvlPct;
+        let totalAttrBonus = strBonus + dexBonus;
+
+        // Phase 3: Total Raw Attack Output
+        let exactAtk = weaponTooltipDmg + totalAttrBonus;
+
+        // Phase 4: Armor Target Defense Formula
+        let finalDmg = exactAtk;
+        let bracketName = "No Armor";
+        let ratio = 0;
+
         if (def > 0) {
-            let r = atk / def; // Ratio of Attack to Defense
-            
-            if (r <= 0.125) {
-                finalDmg = atk * 0.1;
-            } else if (r > 0.125 && r <= 1) {
-                finalDmg = atk * ( (19.2 / 49) * Math.pow((r - 0.125), 2) + 0.1 );
-            } else if (r > 1 && r <= 2.5) {
-                finalDmg = atk * ( (-0.4 / 3) * Math.pow((r - 2.5), 2) + 0.7 );
-            } else if (r > 2.5 && r < 8) {
-                finalDmg = atk * ( (-0.8 / 121) * Math.pow((r - 8), 2) + 0.9 );
+            ratio = exactAtk / def; 
+            if (ratio <= 0.125) {
+                finalDmg = exactAtk * 0.1;
+                bracketName = "1. Extreme Armor (Atk ≤ 1/8 Def)";
+            } else if (ratio > 0.125 && ratio <= 1) {
+                finalDmg = exactAtk * ( (19.2 / 49) * Math.pow((ratio - 0.125), 2) + 0.1 );
+                bracketName = "2. Heavy Armor (1/8 Def < Atk ≤ Def)";
+            } else if (ratio > 1 && ratio <= 2.5) {
+                finalDmg = exactAtk * ( (-0.4 / 3) * Math.pow((ratio - 2.5), 2) + 0.7 );
+                bracketName = "3. Medium Armor (Def < Atk ≤ 2.5x Def)";
+            } else if (ratio > 2.5 && ratio < 8) {
+                finalDmg = exactAtk * ( (-0.8 / 121) * Math.pow((ratio - 8), 2) + 0.9 );
+                bracketName = "4. Light Armor (2.5x Def < Atk < 8x Def)";
             } else {
-                finalDmg = atk * 0.9;
+                finalDmg = exactAtk * 0.9;
+                bracketName = "5. Trivial Armor (Atk ≥ 8x Def)";
             }
+        } else {
+            // Target has exactly 0 Defense (Naked dummy)
+            ratio = Infinity;
+            finalDmg = exactAtk * 0.9;
+            bracketName = "5. No Armor (Atk ≥ 8x Def)";
         }
 
-        // Update UI
-        document.getElementById('outRaw').innerText = atk.toFixed(2);
-        document.getElementById('outFinal').innerText = finalDmg.toFixed(2);
+        // Phase 5: TTK & LETHALITY
+        let targetType = document.getElementById('targetType').value;
+        let targetHp = 0;
+
+        if (targetType === 'player') {
+            let enemyVit = parseInt(document.getElementById('enemyVit').value) || 1;
+            targetHp = 40 + ((enemyVit - 1) * 0.5);
+        } else {
+            targetHp = parseFloat(document.getElementById('customHp').value) || 1;
+        }
+
+        let hitsToKill = finalDmg > 0 ? Math.ceil(targetHp / finalDmg) : Infinity;
+        let ttk = (hitsToKill === Infinity) ? Infinity : Math.max(0, (hitsToKill - 1) * wpnSpeed);
+
+        // --- UPDATE HTML UI ---
+        
+        // Dynamic Tooltip Generation
+        document.getElementById('ttName').innerText = wpnName;
+        document.getElementById('ttStrPct').innerText = strMultRaw + "%";
+        document.getElementById('ttDexPct').innerText = dexMultRaw + "%";
+        document.getElementById('ttSpeed').innerText = wpnSpeed.toFixed(1) + "s";
+
+        let dmgLine = "";
+        let redOut = weaponTooltipDmg.toFixed(1);
+        if (qualBonus === 0 && qualMult === 1.0) {
+            dmgLine = `<span class="mc-red">${redOut}</span>`;
+        } else if (qualBonus === 0) {
+            dmgLine = `<span class="mc-red">${redOut}</span> <span class="mc-yellow">(${baseDmg.toFixed(1)}) x ${qualMult.toFixed(1)}</span>`;
+        } else {
+            dmgLine = `<span class="mc-red">${redOut}</span> <span class="mc-yellow">(${baseDmg.toFixed(1)}+${qualBonus.toFixed(1)}) x ${qualMult.toFixed(1)}</span>`;
+        }
+        document.getElementById('ttDmgLine').innerHTML = dmgLine;
+
+        // Phase 1 & 2 Breakdown
+        document.getElementById('bdWpnDamage').innerText = weaponTooltipDmg.toFixed(2);
+        document.getElementById('bdScalingBase').innerText = scalingBase.toFixed(2);
+        document.getElementById('bdTotalAttrBonus').innerText = "+" + totalAttrBonus.toFixed(4);
+        document.getElementById('bdExactRaw').innerText = exactAtk.toFixed(4);
+
+        // Phase 3 Breakdown
+        document.getElementById('bdRatio').innerText = (ratio === Infinity) ? "Infinity" : ratio.toFixed(4);
+        document.getElementById('bdBracket').innerText = bracketName;
+        document.getElementById('bdFinalDamage').innerText = finalDmg.toFixed(2);
+
+        // Phase 4 Breakdown (TTK)
+        document.getElementById('ttkHp').innerText = targetHp.toFixed(1) + " HP";
+        document.getElementById('ttkSpeed').innerText = wpnSpeed.toFixed(2) + "s Cooldown";
+        
+        if (hitsToKill === Infinity) {
+            document.getElementById('ttkHits').innerText = "Impossible (0 DMG)";
+            document.getElementById('ttkTime').innerText = "Infinite";
+        } else {
+            document.getElementById('ttkHits').innerText = hitsToKill + (hitsToKill === 1 ? " Hit" : " Hits");
+            document.getElementById('ttkTime').innerText = ttk.toFixed(2) + "s";
+        }
     }
 
-    // Run once on load to populate the defaults
-    calculate();
+    calculate(); // Initial load
 </script>
 
 </body>
